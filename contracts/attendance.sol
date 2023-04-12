@@ -71,6 +71,22 @@ function registerStudent(string memory firstName, string memory lastName, string
 }
 
 function addCourse(uint n) public{
-    
+    require(n <= no,"this course does not exist");
+    Course storage courseAdded = CourseNumber[n];
+    address_to_student[msg.sender].courseList.push(courseAdded);
+}
+
+function deleteCourse(uint index) public  returns(Course[] memory)  {
+    student storage myStudent = address_to_student[msg.sender];
+    require(index < myStudent.courseList.length, "Index out of bounds");
+
+    for (uint i = index; i < myStudent.courseList.length - 1; i++) {
+        myStudent.courseList[i] = myStudent.courseList[i+1];
+    }
+
+    delete myStudent.courseList[myStudent.courseList.length - 1];
+    myStudent.courseList.pop();
+    return myStudent.courseList;
+
 }
 }
