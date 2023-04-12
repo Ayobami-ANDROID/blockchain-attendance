@@ -6,6 +6,8 @@ struct student{
     string firstname;
     string lastname;
     string matricNo;
+    string department;
+    College colleges;
     uint regNo;
     uint level;
     Course[] courseList;
@@ -29,6 +31,13 @@ enum AttendStatus{
     absent
 }
 
+enum College{
+    cpas,
+    cbs,
+    coe,
+    cas
+}
+
 // struct attendance{
 //     course courseAttendance;
 //     attendStatus [] attended; 
@@ -36,14 +45,15 @@ enum AttendStatus{
 
 Course[] public courseList;
 student[] public StudentList;
+lecturer[] public lecturerList;
 
 mapping(address => student) address_to_student;
-mapping(address => lecturer) LecturerList;
+mapping(address => lecturer) address_to_lecturer;
 mapping(uint => Course) CourseNumber;
 uint no;
 uint totalNumberOfCourse;
 
-
+//to create new course
 function createCourse(string memory title,string memory code,string memory name) public {
     require(bytes(title).length > 0, "course title cannot be used");
     require(bytes(code).length > 0, "course code cannot be used");
@@ -55,8 +65,8 @@ function createCourse(string memory title,string memory code,string memory name)
     newCourse.totalAttendance = 0;
 }
 
-
-function registerStudent(string memory firstName, string memory lastName, string memory matricNo, uint regno, uint level ) public{
+//to register student
+function registerStudent(string memory firstName, string memory lastName, string memory matricNo, string memory dept, uint regno, uint level,College col ) public{
     require(bytes(firstName).length > 0,"firstname cannot be empty");
     require(bytes(lastName).length > 0,"lastname cannot be empty");
     require(bytes(matricNo).length > 0,"lastname cannot be empty");
@@ -66,10 +76,13 @@ function registerStudent(string memory firstName, string memory lastName, string
     newStudent.matricNo = matricNo;
     newStudent.regNo = regno;
     newStudent.level = level;
+    newStudent.department = dept;
+    newStudent.colleges = col;
     StudentList.push(newStudent);
     no++;
 }
 
+//to return all the list of courses available
 function getAllCourses() public view returns(Course[] memory){
     return courseList;
 }
@@ -98,5 +111,7 @@ function deleteCourse(uint index) public  returns(Course[] memory)  {
 
 }
 
+function createLecturer(string memory name) public{}
+    
 
 }
