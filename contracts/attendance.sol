@@ -70,6 +70,14 @@ function registerStudent(string memory firstName, string memory lastName, string
     no++;
 }
 
+function getAllCourses() public view returns(Course[] memory){
+    return courseList;
+}
+
+function getAllStudent() public view returns(student[] memory){
+    return StudentList;
+} 
+
 function addCourse(uint n) public{
     require(n <= no,"this course does not exist");
     Course storage courseAdded = CourseNumber[n];
@@ -89,4 +97,6 @@ function deleteCourse(uint index) public  returns(Course[] memory)  {
     return myStudent.courseList;
 
 }
+
+
 }
