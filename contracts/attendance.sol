@@ -1,7 +1,9 @@
-//SPDX-Licensce-Identifier: MIT
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.8;
 
 contract attendance{
+
+//to register student
 struct student{
     string firstname;
     string lastname;
@@ -13,6 +15,7 @@ struct student{
     Course[] courseList;
 }
 
+//to register course
 struct Course{
     string courseTitle;
     string courseCode;
@@ -21,16 +24,19 @@ struct Course{
     AttendStatus[] attended;
 }
 
+//to register lecturer
 struct lecturer{
     string name;
     Course[] courseTitle;
 }
 
+//attendance status
 enum AttendStatus{
     present,
     absent
 }
 
+//college
 enum College{
     cpas,
     cbs,
@@ -43,13 +49,13 @@ enum College{
 //     attendStatus [] attended; 
 // }
 
-Course[] public courseList;
-student[] public StudentList;
-lecturer[] public lecturerList;
+Course[] public courseList; //array of courses
+student[] public StudentList;//array of students
+lecturer[] public lecturerList;//array of lecturer
 
-mapping(address => student) address_to_student;
-mapping(address => lecturer) address_to_lecturer;
-mapping(uint => Course) CourseNumber;
+mapping(address => student) address_to_student;//mapping of address to student
+mapping(address => lecturer) address_to_lecturer;// mapping of address to lecturer
+mapping(uint => Course) CourseNumber;// mapping of int to course
 uint no;
 uint totalNumberOfCourse;
 
@@ -61,8 +67,10 @@ function createCourse(string memory title,string memory code,string memory name)
     Course storage newCourse = CourseNumber[no];
     newCourse.courseTitle = title;
     newCourse.courseCode = code;
-    newCourse.lecturerName = name;
+    // newCourse.lecturerName = name;
     newCourse.totalAttendance = 0;
+    totalNumberOfCourse ++;
+    no++;
 }
 
 //to register student
@@ -79,7 +87,6 @@ function registerStudent(string memory firstName, string memory lastName, string
     newStudent.department = dept;
     newStudent.colleges = col;
     StudentList.push(newStudent);
-    no++;
 }
 
 //to return all the list of courses available
@@ -87,16 +94,36 @@ function getAllCourses() public view returns(Course[] memory){
     return courseList;
 }
 
+//to return all the student
 function getAllStudent() public view returns(student[] memory){
     return StudentList;
 } 
 
+// function validateCourse(uint n) public view returns(bool){
+//      for(uint i= 0 ; i < address_to_student[msg.sender].courseList.length; i++ ){
+//         string memory studentCourse = address_to_student[msg.sender].courseList[i].courseCode;
+//         string memory cours = CourseNumber[n].courseCode;
+//         if( studentCourse == cours   ){
+//             return true;
+//         }
+//     }
+// }
+
+//to add a course
 function addCourse(uint n) public{
     require(n <= no,"this course does not exist");
+   
     Course storage courseAdded = CourseNumber[n];
     address_to_student[msg.sender].courseList.push(courseAdded);
 }
 
+//get student course
+function getStudentCourse() public view returns(Course[] memory){
+   Course[] storage studentCourses = address_to_student[msg.sender].courseList; 
+   return studentCourses;
+}
+
+//to delete a course
 function deleteCourse(uint index) public  returns(Course[] memory)  {
     student storage myStudent = address_to_student[msg.sender];
     require(index < myStudent.courseList.length, "Index out of bounds");
@@ -111,7 +138,26 @@ function deleteCourse(uint index) public  returns(Course[] memory)  {
 
 }
 
-function createLecturer(string memory name) public{}
+//create a lecturer
+function createLecturer(string memory name,address lectures) public{
+    lecturer storage newLecturer = address_to_lecturer[lectures];
+    newLecturer.name = name;
+    
+}
+
+//to add a lecturer course
+function AddlecturerCourse(uint course,address lectures) public{
+    lecturer storage addCourseLecturer = address_to_lecturer[lectures];
+    addCourseLecturer.courseTitle.push(CourseNumber[course]); 
+} 
+
+//to add get a list of courses taken by a lecturer
+function lecturerCourseList (address lecture) public view returns(Course [] memory){
+    Course[] storage lecturer_course = address_to_lecturer[lecture].courseTitle;
+    return lecturer_course; 
+}
+
+
     
 
 }
