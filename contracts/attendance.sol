@@ -99,20 +99,21 @@ function getAllStudent() public view returns(student[] memory){
     return StudentList;
 } 
 
-// function validateCourse(uint n) public view returns(bool){
-//      for(uint i= 0 ; i < address_to_student[msg.sender].courseList.length; i++ ){
-//         string memory studentCourse = address_to_student[msg.sender].courseList[i].courseCode;
-//         string memory cours = CourseNumber[n].courseCode;
-//         if( studentCourse == cours   ){
-//             return true;
-//         }
-//     }
-// }
+//validateCourse
+function validateCourse(uint n) public view returns(bool) {
+    string memory courseCode = CourseNumber[n].courseCode;
+    for (uint i = 0; i < address_to_student[msg.sender].courseList.length; i++) {
+        if (keccak256(bytes(address_to_student[msg.sender].courseList[i].courseCode)) == keccak256(bytes(courseCode))) {
+            return true;
+        }
+    }
+    return false;
+}
 
 //to add a course
 function addCourse(uint n) public{
     require(n <= no,"this course does not exist");
-   
+    require(validateCourse(n) == false,"you have already registered course");
     Course storage courseAdded = CourseNumber[n];
     address_to_student[msg.sender].courseList.push(courseAdded);
 }
