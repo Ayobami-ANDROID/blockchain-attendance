@@ -12,7 +12,8 @@ struct student{
     College colleges;
     uint regNo;
     uint level;
-    Course[] courseList;
+    address addr;
+    Course[] courselist;
 }
 
 //to register course
@@ -21,6 +22,7 @@ struct Course{
     string courseCode;
     string lecturerName;
     uint totalAttendance;
+    uint[] timeStamp;
     AttendStatus[] attended;
 }
 
@@ -86,6 +88,7 @@ function registerStudent(string memory firstName, string memory lastName, string
     newStudent.level = level;
     newStudent.department = dept;
     newStudent.colleges = col;
+    newStudent.addr = msg.sender;
     StudentList.push(newStudent);
 }
 
@@ -102,8 +105,8 @@ function getAllStudent() public view returns(student[] memory){
 //validateCourse
 function validateCourse(uint n) public view returns(bool) {
     string memory courseCode = CourseNumber[n].courseCode;
-    for (uint i = 0; i < address_to_student[msg.sender].courseList.length; i++) {
-        if (keccak256(bytes(address_to_student[msg.sender].courseList[i].courseCode)) == keccak256(bytes(courseCode))) {
+    for (uint i = 0; i < address_to_student[msg.sender].courselist.length; i++) {
+        if (keccak256(bytes(address_to_student[msg.sender].courselist[i].courseCode)) == keccak256(bytes(courseCode))) {
             return true;
         }
     }
@@ -115,27 +118,27 @@ function addCourse(uint n) public{
     require(n <= no,"this course does not exist");
     require(validateCourse(n) == false,"you have already registered course");
     Course storage courseAdded = CourseNumber[n];
-    address_to_student[msg.sender].courseList.push(courseAdded);
+    address_to_student[msg.sender].courselist.push(courseAdded);
 }
 
 //get student course
 function getStudentCourse() public view returns(Course[] memory){
-   Course[] storage studentCourses = address_to_student[msg.sender].courseList; 
+   Course[] storage studentCourses = address_to_student[msg.sender].courselist; 
    return studentCourses;
 }
 
 //to delete a course
 function deleteCourse(uint index) public  returns(Course[] memory)  {
     student storage myStudent = address_to_student[msg.sender];
-    require(index < myStudent.courseList.length, "Index out of bounds");
+    require(index < myStudent.courselist.length, "Index out of bounds");
 
-    for (uint i = index; i < myStudent.courseList.length - 1; i++) {
-        myStudent.courseList[i] = myStudent.courseList[i+1];
+    for (uint i = index; i < myStudent.courselist.length - 1; i++) {
+        myStudent.courselist[i] = myStudent.courselist[i+1];
     }
 
-    delete myStudent.courseList[myStudent.courseList.length - 1];
-    myStudent.courseList.pop();
-    return myStudent.courseList;
+    delete myStudent.courselist[myStudent.courselist.length - 1];
+    myStudent.courselist.pop();
+    return myStudent.courselist;
 
 }
 
@@ -158,7 +161,23 @@ function lecturerCourseList (address lecture) public view returns(Course [] memo
     return lecturer_course; 
 }
 
+function takeAttendance(uint n,address t,uint index,uint[] memory reg,AttendStatus status) public{
+    require(n <= no,"this course does not exist");
+    require(index <= address_to_lecturer[t].courseTitle.length,"you don't lecture this course" );
+    address_to_lecturer[t].courseTitle[index].totalAttendance +=1;
+    
+    for(uint i =0; i< reg.length;i++){
+        if(reg[i] == StudentList[i].regNo){
+            address addr = StudentList[i].addr;
+            for(uint x=0; x< courseList.length;i++){
+                require(keccak256(bytes(address_to_student[addr].courselist[x].courseCode)) == keccak256 (bytes(CourseNumber[no].courseCode)),"course not found");
+                address_to_student[addr].courselist[x].attended.push(status);
+            }
+            
+        }
+    }
 
+}
     
 
 }
